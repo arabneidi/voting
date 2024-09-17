@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>reCAPTCHA v3 Test with Verification</title>
+    <!-- Google reCAPTCHA v3 Script -->
+    <script src="https://www.google.com/recaptcha/api.js?render=6LeOrkMqAAAAALlg9LO97aMKcg6YwQhNcEMXFOCQ"></script> <!-- Replace with your actual Site Key -->
+</head>
+<body>
+    <h1>reCAPTCHA v3 Test</h1>
+    <button onclick="executeRecaptcha()">Test reCAPTCHA</button>
+
+    <script>
+        function executeRecaptcha() {
+            grecaptcha.ready(function() {
+                grecaptcha.execute('6LeOrkMqAAAAALlg9LO97aMKcg6YwQhNcEMXFOCQ', { action: 'test' }).then(function(token) {
+                    alert("reCAPTCHA token: " + token);
+                    
+                    // Send the token to the backend to verify with Google's API
+                    fetch('https://www.google.com/recaptcha/api/siteverify', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: `secret=your_secret_key_here&response=${token}`  // Replace 'your_secret_key_here' with your actual secret key
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Verification result:', data);
+                        alert("Verification result: " + JSON.stringify(data));
+                    })
+                    .catch(error => {
+                        console.error("Verification error:", error);
+                        alert("Verification error: " + error);
+                    });
+                }).catch(function (error) {
+                    console.error("reCAPTCHA error:", error);  // Log any reCAPTCHA errors
+                    alert("reCAPTCHA error: " + error);
+                });
+            });
+        }
+    </script>
+</body>
+</html>
+</title>
+</head>
+<body>
+
+</body>
+</html>

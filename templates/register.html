@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google reCAPTCHA v3 Script -->
+    <script src="https://www.google.com/recaptcha/api.js?render=6Lf8EUQqAAAAANqtyTBLHlT8s906EPfS7JId8AHp"></script> <!-- Replace with your Site Key -->
+</head>
+<body class="bg-light">
+    <div class="container">
+        <div class="row justify-content-center mt-5">
+            <div class="col-md-6">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h2 class="text-center mb-4">Register</h2>
+
+                        <!-- Flash Message Section -->
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                        <div class="alert alert-danger" role="alert">
+                            {% for category, message in messages %}
+                                <div>{{ message }}</div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        {% endwith %}
+
+                        <!-- Registration Form -->
+                        <form id="registerForm" method="POST" action="/register">
+                            <div class="mb-3">
+                                <label for="first_name" class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="first_name" name="first_name" required placeholder="Enter your first name"
+                                       value="{{ request.form.first_name }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="last_name" class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="last_name" name="last_name" required placeholder="Enter your last name"
+                                       value="{{ request.form.last_name }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="sex" class="form-label">Sex</label>
+                                <select class="form-select" id="sex" name="sex" required>
+                                    <option value="Male" {% if request.form.sex == "Male" %}selected{% endif %}>Male</option>
+                                    <option value="Female" {% if request.form.sex == "Female" %}selected{% endif %}>Female</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="national_id" class="form-label">National ID</label>
+                                <input type="text" class="form-control" id="national_id" name="national_id" required placeholder="Enter your national ID"
+                                       value="{{ request.form.national_id }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="country_code" class="form-label">Country Code</label>
+                                <select class="form-select" id="country_code" name="country_code" required>
+                                    <option value="+1" {% if request.form.country_code == "+1" %}selected{% endif %}>+1 (USA/Canada)</option>
+                                    <option value="+44" {% if request.form.country_code == "+44" %}selected{% endif %}>+44 (UK)</option>
+                                    <option value="+91" {% if request.form.country_code == "+91" %}selected{% endif %}>+91 (India)</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="phone_number" class="form-label">Phone Number</label>
+                                <input type="text" class="form-control" id="phone_number" name="phone_number" required placeholder="Enter your phone number"
+                                       value="{{ request.form.phone_number }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="email" name="email" required placeholder="Enter your email"
+                                       value="{{ request.form.email }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="password" name="password" required placeholder="Enter your password">
+                            </div>
+                            <div class="mb-3">
+                                <label for="confirm_password" class="form-label">Confirm Password</label>
+                                <input type="password" class="form-control" id="confirm_password" name="confirm_password" required placeholder="Confirm your password">
+                            </div>
+
+                            <!-- OTP Input -->
+                            <div class="mb-3">
+                                <label for="otp" class="form-label">OTP</label>
+                                <input type="text" class="form-control" id="otp" name="otp" placeholder="Enter your OTP" disabled>
+                                <button type="button" class="btn btn-warning mt-2" id="sendOtpBtn">Send OTP</button>
+                            </div>
+
+                            <!-- Hidden input for reCAPTCHA -->
+                            <input type="hidden" id="recaptchaToken" name="recaptchaToken">
+
+                            <div class="d-grid mt-3">
+                                <button type="submit" id="registerBtn" class="btn btn-success">Register</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- reCAPTCHA v3 Integration -->
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', function (e) {
+            e.preventDefault();  // Prevent default form submission
+
+            grecaptcha.ready(function () {
+                grecaptcha.execute('6Lf8EUQqAAAAANqtyTBLHlT8s906EPfS7JId8AHp', { action: 'register' }).then(function (token) {
+                    document.getElementById('recaptchaToken').value = token;
+                    e.target.submit();  // Submit the form after setting reCAPTCHA
+                }).catch(function (error) {
+                    console.error("reCAPTCHA error:", error);
+                });
+            });
+        });
+
+        // Disable register button initially
+        document.getElementById('registerBtn').disabled = true;
+        document.getElementById('otp').disabled = true;
+
+        // Send OTP when the user clicks the "Send OTP" button
+        document.getElementById('sendOtpBtn').addEventListener('click', function() {
+            const phone_number = document.getElementById('phone_number').value;
+            const country_code = document.getElementById('country_code').value;
+
+            if (!phone_number) {
+                alert('Please enter your phone number.');
+                return;
+            }
+
+            fetch('/send_otp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    phone_number: phone_number,
+                    country_code: country_code,
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('OTP sent to your phone.');
+                    document.getElementById('otp').disabled = false;  // Enable OTP input
+                    document.getElementById('registerBtn').disabled = false;  // Enable register button
+                } else {
+                    alert('Failed to send OTP. Please try again.');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

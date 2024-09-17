@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audit Voting Results</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container">
+        <div class="row justify-content-center mt-5">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h2 class="text-center mb-4">Audit Portal - Voting Results</h2>
+                        <ul id="results" class="list-group">
+                            <!-- Results will be injected here -->
+                        </ul>
+                        <div class="text-center mt-4">
+                            <a href="/home" class="btn btn-primary">Back to Home</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Script to Fetch and Display Audit Results -->
+    <script>
+        async function fetchResults() {
+            const response = await fetch('/audit_results');
+            const data = await response.json();
+
+            const resultsList = document.getElementById('results');
+            resultsList.innerHTML = '';  // Clear existing results
+
+            if (data.votes.length === 0) {
+                resultsList.innerHTML = '<li class="list-group-item">No votes to display.</li>';
+            } else {
+                data.votes.forEach(vote => {
+                    const listItem = document.createElement('li');
+                    listItem.className = 'list-group-item';
+                    listItem.textContent = `User ID: ${vote.user_id}, Voted for Candidate ID: ${vote.candidate_id}`;
+                    resultsList.appendChild(listItem);
+                });
+            }
+        }
+
+        // Fetch results when the page loads
+        window.onload = fetchResults;
+    </script>
+</body>
+</html>
