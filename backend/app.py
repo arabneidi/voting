@@ -16,10 +16,11 @@ from blockchain import Blockchain, Block, BlockchainModel
 import json
 from time import time
 import base64
+from flask_migrate import Migrate
 
 
 # reCAPTCHA v3 secret key
-RECAPTCHA_SECRET_KEY = '6Lf8EUQqAAAAAISenK6KEr1_2s4clXTnhruwJ3Tj'  # Replace with your secret key
+RECAPTCHA_SECRET_KEY = os.getenv('RECAPTCHA_SECRET_KEY')  # Replace with your secret key
 
 app = Flask(__name__, template_folder='C:/Users/shexe/PycharmProjects/voting/templates')
 
@@ -92,7 +93,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=15)
 
 db = SQLAlchemy(app)
-
+migrate = Migrate(app, db)
 
 # Load the encryption key from the secret.key file
 def load_encryption_key():
